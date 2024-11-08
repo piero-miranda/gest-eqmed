@@ -16,7 +16,13 @@ scope = [
     "https://www.googleapis.com/auth/drive"
 ]
 credentials = Credentials.from_service_account_file("credentials.json", scopes=scope)
-gc = gspread.authorize(credentials)
+
+import google.auth.transport.requests
+
+request = google.auth.transport.requests.Request()
+credentials.refresh(request)
+gc = gspread.Client(auth=credentials)
+gc.session = google.auth.transport.requests.AuthorizedSession(credentials)
 
 # Función para reintentar lectura con espera
 def retry_read_sheet(retries=3, wait_time=5):
